@@ -106,7 +106,6 @@ class HashMultiset<E> implements Multiset<E> {
             map.clear();
         } else {
             Iterator<Map.Entry<E, Integer>> iterator = map.entrySet().iterator();
-
             // Iterate over the HashMap
             while (iterator.hasNext()) {
                 // Get the entry at this iteration
@@ -114,7 +113,6 @@ class HashMultiset<E> implements Multiset<E> {
                         entry
                         = iterator.next();
                 E key = entry.getKey();
-
                 if (other.contains(key)) {
                     map.replace(key, map.get(key),
                             Math.min(getMultiplicity(key), other.getMultiplicity(key)));

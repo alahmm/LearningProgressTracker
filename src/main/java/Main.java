@@ -292,6 +292,49 @@ public class Main {
         }
 
     }
+    public static void PrintNotification(String firstName, String lastName,
+                                         String email, String course) {
+        System.out.printf("To: %s%n\n" +
+                        "Re: Your Learning Progress%n\n" +
+                        "Hello, %s %s! You have accomplished our %s course!",
+                email, firstName, lastName, course);
+    }
+    public static void Notifier(List<PersonalData> personalDataList) {
+        int counterOfStudents = 0;
+        int counter = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().getJava() == 600) {
+                PrintNotification(personalData.getFirstName(),
+                        personalData.getLastName(), personalData.getEmail(), "Java");
+                counter ++;
+            }
+            if (personalData.getPoints().getDsa() == 400) {
+                PrintNotification(personalData.getFirstName(),
+                        personalData.getLastName(), personalData.getEmail(), "DSA");
+                if (counter == 0) {
+                    counter++;
+                }
+            }
+            if (personalData.getPoints().getDatabases() == 480) {
+                PrintNotification(personalData.getFirstName(),
+                        personalData.getLastName(), personalData.getEmail(), "Databases");
+                if (counter == 0) {
+                    counter++;
+                }
+            }
+            if (personalData.getPoints().getSpring() == 550) {
+                PrintNotification(personalData.getFirstName(),
+                        personalData.getLastName(), personalData.getEmail(), "Spring");
+                if (counter == 0) {
+                    counter++;
+                }
+            }
+            counterOfStudents += counter;
+            counter = 0;
+        }
+        System.out.printf("Total %d students have been notified.", counterOfStudents);
+    }
     public static void main(String[] args) {
 
         System.out.println("Learning Progress Tracker");
@@ -302,6 +345,7 @@ public class Main {
         String regexEmail = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9]+$";
         List<PersonalData> personalDataList = new ArrayList<>();
         List<Integer> listOfIds = new ArrayList<>();
+        int iNotifier = 0;
         int i = 0;
         int idNew = 100;
         while (scanner.hasNextLine()) {
@@ -350,6 +394,13 @@ public class Main {
                             } else {
                                 CoursePrinter(whichCourse.toUpperCase(), personalDataList);
                             }
+                        }
+                    } else if (input.equals("notify")) {
+                        if (iNotifier == 0) {
+                            Notifier(personalDataList);
+                            iNotifier++;
+                        } else {
+                            System.out.println("Total 0 students have been notified.");
                         }
                     } else if (input.equals("list")) {
                         if (listOfIds.isEmpty()) {
@@ -433,6 +484,8 @@ public class Main {
             } else if (input.equals("exit")) {
                 System.out.println("Bye!");
                 return;
+            } else if (input.equals("notify")) {
+                System.out.println("Total 0 students have been notified.");
             } else if (input.equals("add points")) {
                 System.out.println("Enter an id and points or 'back' to return");
             } else if (input.equals("find")) {
@@ -484,6 +537,13 @@ class PersonalData {
         this.lastName = lastName;
     }
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
 
     public int getId() {
         return id;

@@ -32,8 +32,20 @@ public class Main {
             System.out.println("Incorrect points format.");
         } else {
             if (isRightFormat(listOfPoints)) {
-                Points points = new Points(Integer.parseInt(listOfPoints[1]), Integer.parseInt(listOfPoints[2])
-                        , Integer.parseInt(listOfPoints[3]), Integer.parseInt(listOfPoints[4]));
+                int newJava, newDsa, newDatabase, newSpring = 0;
+                if (personalData.getPoints()!= null) {
+                    newJava = personalData.getPoints().getJava() + Integer.parseInt(listOfPoints[1]);
+                    newDsa = personalData.getPoints().getDsa() + Integer.parseInt(listOfPoints[2]);
+                    newDatabase = personalData.getPoints().getDatabases() + Integer.parseInt(listOfPoints[3]);
+                    newSpring = personalData.getPoints().getSpring() + Integer.parseInt(listOfPoints[4]);
+                } else {
+                    newJava = Integer.parseInt(listOfPoints[1]);
+                    newDsa = Integer.parseInt(listOfPoints[2]);
+                    newDatabase = Integer.parseInt(listOfPoints[3]);
+                    newSpring = Integer.parseInt(listOfPoints[4]);
+                }
+
+                Points points = new Points(newJava, newDsa, newDatabase, newSpring);
                 System.out.println("Points updated.");
                 personalData.setPoints(points);
             }
@@ -49,8 +61,8 @@ public class Main {
 
     public static void Finder(PersonalData personalData) {
         System.out.printf("%d points: Java=%d; DSA=%d; Databases=%d; Spring=%d%n", personalData.getId(),
-                personalData.getPoints().getJava() * 2, personalData.getPoints().getDsa() * 2,
-                personalData.getPoints().getDatabases() * 2, personalData.getPoints().getSpring() * 2);
+                personalData.getPoints().getJava(), personalData.getPoints().getDsa(),
+                personalData.getPoints().getDatabases(), personalData.getPoints().getSpring());
     }
     public static boolean isAdded(List<PersonalData> personalDataList, PersonalData personalData,
                                   List<Integer> listOfIds, String email) {
@@ -66,7 +78,220 @@ public class Main {
         return false;
     }
 
+    public static boolean isMostPopular(List<PersonalData> personalDataList, String course) {
+        int i = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().decider(course) != 0) {
+                i++;
+            }
+        }
+        return i >= 2;
+    }
+    public static boolean isLeastPopular(List<PersonalData> personalDataList, String course) {
+        int i = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().decider(course) != 0) {
+                i++;
+            }
+        }
+        return i == 1 || i == 0;
+    }
+    public static boolean isLowestActivity(List<PersonalData> personalDataList, String course) {
+        int i = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().decider(course) != 0) {
+                i++;
+            }
+        }
+        return i == 0 || i == 1;
+    }
+    public static int EasiestHardestCourse(List<PersonalData> personalDataList, String course) {
+        int i = 0;
+        int point = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().decider(course) != 0) {
+                point += personalData.getPoints().decider(course);
+                i++;
+            }
+        }
+        if (i != 0) {
+            return point/i;
+        }
+        return 0;
+    }
+    public static boolean isEasiestCourse(List<PersonalData> personalDataList, String course, String[] courses) {
+        int actualPoint = EasiestHardestCourse(personalDataList, course);
+        List<String> otherCourses = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            if (!courses[i].equals(course)) {
+                otherCourses.add(courses[i]);
+            }
+        }
+        return actualPoint > EasiestHardestCourse(personalDataList, otherCourses.get(0))
+                && actualPoint > EasiestHardestCourse(personalDataList, otherCourses.get(1))
+                && actualPoint > EasiestHardestCourse(personalDataList, otherCourses.get(2));
+    }
+    public static boolean isHardestCourse(List<PersonalData> personalDataList, String course, String[] courses) {
+        int actualPoint = EasiestHardestCourse(personalDataList, course);
+        List<String> otherCourses = new ArrayList<>();
+        for (int i = 0; i < 4; i++) {
+            if (!courses[i].equals(course)) {
+                otherCourses.add(courses[i]);
+            }
+        }
+        return actualPoint < EasiestHardestCourse(personalDataList, otherCourses.get(0))
+                && actualPoint < EasiestHardestCourse(personalDataList, otherCourses.get(1))
+                && actualPoint < EasiestHardestCourse(personalDataList, otherCourses.get(2));
+    }
+    public static boolean isHighestActivity(List<PersonalData> personalDataList, String course) {
+        int i = 0;
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (personalData.getPoints().decider(course) != 0) {
+                i++;
+            }
+        }
+        return i >= 2;
+    }
+    public static void StatisticsPrinter(String[] courses, List<PersonalData> personalDataList) {
+        boolean isLeastPopular = false;
+        boolean isMostPopular = false;
+        boolean isHighestActivity = false;
+        boolean isLowestActivity = false;
+        boolean isHardestCourse = false;
+        boolean isEasiestCourse = false;
+        int howMany = 0;
+        String calculate = "";
 
+        System.out.print("Most popular: ");
+        for (String course : courses
+        ) {
+            if (isMostPopular(personalDataList, course)) {
+                calculate += course + ", ";
+                isMostPopular = true;
+            }
+        }
+        if (!isMostPopular) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+        calculate = "";
+        System.out.println();
+        System.out.print("Least popular: ");
+        for (String course : courses
+        ) {
+            if (isLeastPopular(personalDataList, course)) {
+                calculate += course + ", ";
+                isLeastPopular = true;
+                howMany ++;
+            }
+        }
+        if (!isLeastPopular || howMany == 4) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+        howMany = 0;
+        calculate = "";
+        System.out.println();
+        System.out.print("Highest activity: ");
+        for (String course : courses
+        ) {
+            if (isHighestActivity(personalDataList, course)) {
+                calculate += course + ", ";
+                isHighestActivity = true;
+            }
+        }
+        if (!isHighestActivity) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+        calculate = "";
+        System.out.println();
+        System.out.print("Lowest activity: ");
+        for (String course : courses
+        ) {
+            if (isLowestActivity(personalDataList, course)) {
+                calculate += course + ", ";
+                isLowestActivity = true;
+                howMany++;
+            }
+        }
+        if (!isLowestActivity || howMany == 4) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+        calculate = "";
+        System.out.println();
+        System.out.print("Easiest course: ");
+        for (String course : courses
+        ) {
+            if (isEasiestCourse(personalDataList, course, courses)) {
+                calculate += course + ", ";
+                isEasiestCourse = true;
+            }
+        }
+        if (!isEasiestCourse) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+        calculate = "";
+        System.out.println();
+        System.out.print("Hardest course: ");
+        for (String course : courses
+        ) {
+            if (isHardestCourse(personalDataList, course, courses)) {
+                calculate += course + ", ";
+                isHardestCourse = true;
+            }
+        }
+        if (!isHardestCourse) {
+            System.out.print("n/a");
+        } else {
+            System.out.print(calculate.substring(0, calculate.length() - 2));
+        }
+    }
+    public static void CoursePrinter(String course, List<PersonalData> personalDataList) {
+        int mustEarned;
+        switch (course) {
+            case "JAVA" -> mustEarned = 600;
+            case "DSA" -> mustEarned = 400;
+            case "DATABASES" -> mustEarned = 480;
+            default -> mustEarned = 550;
+        }
+
+        String progress = String.format(course+"%n"+"id points completed%n");
+        Map<Integer, Integer> mapOfStudent = new TreeMap<>();
+        for (PersonalData personalData : personalDataList
+        ) {
+            if (course.equals("JAVA") && personalData.getPoints().getJava() != 0) {
+                mapOfStudent.put(personalData.getId(), personalData.getPoints().getJava());
+            } else if (course.equals("DSA") && personalData.getPoints().getDsa() != 0) {
+                mapOfStudent.put(personalData.getId(), personalData.getPoints().getDsa());
+            } else if (course.equals("DATABASES") && personalData.getPoints().getDatabases() != 0) {
+                mapOfStudent.put(personalData.getId(), personalData.getPoints().getDatabases());
+            } else if (course.equals("SPRING") && personalData.getPoints().getSpring() != 0) {
+                mapOfStudent.put(personalData.getId(), personalData.getPoints().getSpring());
+            }
+        }
+        List<Map.Entry<Integer, Integer>> list = new ArrayList<>(mapOfStudent.entrySet());
+        list.sort(new ValueThenKeyComparator<>());
+        System.out.print(progress);
+        for (Map.Entry<Integer, Integer> map : list
+        ) {
+            double devision = map.getValue() * 100.0 / mustEarned;
+            System.out.printf("%d %d %.1f%%%n", map.getKey(), map.getValue(), map.getValue() * 100.0/ mustEarned);
+        }
+
+    }
     public static void main(String[] args) {
 
         System.out.println("Learning Progress Tracker");
@@ -113,7 +338,19 @@ public class Main {
                                 }
                             }
                         }
-
+                    } else if (input.equals("statistics")) {
+                        System.out.println("Type the name of a course to see details or 'back' to quit:");
+                        String[] courses = {"Java", "DSA", "Databases", "Spring"};
+                        StatisticsPrinter(courses, personalDataList);
+                        String whichCourse;
+                        while (scanner.hasNextLine()) {
+                            whichCourse = scanner.nextLine();
+                            if (whichCourse.equals("back")) {
+                                break;
+                            } else {
+                                CoursePrinter(whichCourse.toUpperCase(), personalDataList);
+                            }
+                        }
                     } else if (input.equals("list")) {
                         if (listOfIds.isEmpty()) {
                             System.out.println("No students found");
@@ -200,6 +437,22 @@ public class Main {
                 System.out.println("Enter an id and points or 'back' to return");
             } else if (input.equals("find")) {
                 System.out.println("Enter an id or 'back' to return:");
+            } else if (input.equals("statistics")) {
+                System.out.println("Type the name of a course to see details or 'back' to quit:");
+                String[] courses = {"Java", "DSA", "Databases", "Spring"};
+                StatisticsPrinter(courses, personalDataList);
+                String whichCourse;
+                while (scanner.hasNextLine()) {
+                    whichCourse = scanner.nextLine();
+                    if (whichCourse.equals("back")) {
+                        break;
+                    } else {
+                        if (Arrays.stream(courses).map(String::toUpperCase).toList().contains(whichCourse.toUpperCase())) {
+                            CoursePrinter(whichCourse.toUpperCase(), personalDataList);
+                        } else {
+                            System.out.println("Unknown course.");
+                        }                    }
+                }
             } else {
                 System.out.println("Unknown command!");
             }
@@ -270,6 +523,29 @@ class Points {
         return spring;
     }
 
+    public int decider(String course) {
+        return switch (course) {
+            case "Java" -> getJava();
+            case "DSA" -> getDsa();
+            case "Databases" -> getDatabases();
+            default -> getSpring();
+        };
+    }
+}
+class ValueThenKeyComparator<K extends Comparable<? super K>,
+        V extends Comparable<? super V>>
+        implements Comparator<Map.Entry<K, V>> {
+
+    public int compare(Map.Entry<K, V> a, Map.Entry<K, V> b) {
+        int cmp1 = b.getValue().compareTo(a.getValue());
+        if (cmp1 != 0) {
+            return cmp1;
+        } else {
+            return a.getKey().compareTo(b.getKey());
+        }
+    }
 
 }
+
+
 
